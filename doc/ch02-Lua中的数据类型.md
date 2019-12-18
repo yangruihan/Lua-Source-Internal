@@ -21,8 +21,6 @@
 #define LUA_TTHREAD		8
 ```
 
-其中大部分类型很容易理解，比如`LUA_TNUMBER`就表示的数值类型，`LUA_TBOOLEAN`表示的是布尔类型，不过这里有两个比较特殊的类型：`LUA_TLIGHTUSERDATA`和`LUA_TUSERDATA`一样，对应的都是`void*`指针，区别在于，`LUA_TLIGHTUSERDATA`的分配释放是由 Lua 外部的使用者来完成，而`LUA_TUSERDATA`则是通过 Lua 内部来完成的，换言之，前者不需要 Lua 去关心它的生存期，由使用者自己去关注，后者则反之。
-
 那么 Lua 中是怎么样表示一个数据呢，可以看一下源代码
 
 ```c
@@ -40,7 +38,24 @@ typedef union Value {
 } Value;
 ```
 
-源代码注释已经很详细了，不过这些数据到底是什么类型的。于是 Lua 代码中又有了一个`TValuefields`，将`Value`和类型结合在一起:
+结合上面的类型，我们可以得到一张对应表
+
+|宏|类型|对应字段或数据结构|
+|:---|:---|:---|
+|LUA_TNONE|-|-|
+|LUA_TNIL|空类型|-|
+|LUA_TBOOLEAN|布尔类型|-|
+|LUA_TLIGHTUSERDATA|指针|void *p|
+|LUA_TNUMBER|数值|lua_Integer i/lua_Number n|
+|LUA_TSTRING|字符串|TString|
+|LUA_TTABLE|表|Table|
+|LUA_TFUNCTION|函数|CClosure/LClosure|
+|LUA_TUSERDATA|指针|void *p|
+|LUA_TTHREAD|Lua虚拟机、协程|lua_State|
+
+其中大部分类型很容易理解，比如`LUA_TNUMBER`就表示的数值类型，`LUA_TBOOLEAN`表示的是布尔类型，不过这里有两个比较特殊的类型：`LUA_TLIGHTUSERDATA`和`LUA_TUSERDATA`一样，对应的都是`void*`指针，区别在于，`LUA_TLIGHTUSERDATA`的分配释放是由 Lua 外部的使用者来完成，而`LUA_TUSERDATA`则是通过 Lua 内部来完成的，换言之，前者不需要 Lua 去关心它的生存期，由使用者自己去关注，后者则反之。
+
+不过这些数据到底是什么类型呢。于是 Lua 代码中又有了一个`TValuefields`，将`Value`和类型结合在一起:
 
 ```c
 /**
@@ -168,6 +183,13 @@ union GCUnion {
 
 ![](../pic/ch02-1.png)
 
+**总结**
+
+- GC 类型中有`CommonHeader`，用来存放所有数据类型都通用的字段
+
+- `TValue`作为统一表示所有数据的数据结构，内部使用了联合体`Value`将所有数据都包起来
+
+在具体代码中，`TValue`用于统一地表示数据，而一旦知道了具体的类型，就需要使用具体的类型转换逻辑，将其转换成对应的类型
 
 创建一个`GCObject`逻辑如下：
 
