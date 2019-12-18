@@ -167,3 +167,48 @@ union GCUnion {
 以上提到的结构关系如下图：
 
 ![](../pic/ch02-1.png)
+
+
+创建一个`GCObject`逻辑如下：
+
+```c
+/*
+** create a new collectable object (with given type and size) and link
+** it to 'allgc' list.
+** (lgc.c)
+*/
+GCObject *luaC_newobj (lua_State *L, int tt, size_t sz) {
+  global_State *g = G(L);
+  GCObject *o = cast(GCObject *, luaM_newobject(L, novariant(tt), sz));
+  o->marked = luaC_white(g);
+  o->tt = tt;
+  o->next = g->allgc;
+  g->allgc = o;
+  return o;
+}
+```
+
+像`TString`、`Table`这种子类型，都会调用这个接口来创建一个`GCObject`，区别只是传入的`type(tt)`和内存`size(sz)`不一样。这个公用函数也会初始化掉`CommonHeader`部分的数据，每个类型只需要把创建好实例剩余部分的数据设置好即可，比如下面举String类型的例子：
+
+```c
+/*
+** creates a new string object
+** (lstring.c)
+*/
+static TString *createstrobj (lua_State *L, size_t l, int tag, unsigned int h) {
+  TString *ts;
+  GCObject *o;
+  size_t totalsize;  /* total size of TString object */
+  totalsize = sizelstring(l);
+  o = luaC_newobj(L, tag, totalsize);
+  ts = gco2ts(o);
+  ts->hash = h;
+  ts->extra = 0;
+  getstr(ts)[l] = '\0';  /* ending 0 */
+  return ts;
+}
+```
+
+引用关系图如下：
+
+![](../pic/ch02-2.png)
