@@ -1,9 +1,6 @@
-*本书已经由图灵出版社正式出版，书名[《Lua设计与实现》](https://book.douban.com/subject/27108476/)。*
+本库原地址：https://github.com/lichuang/Lua-Source-Internal
 
-*喜欢的朋友，可以购买一本支持作者，购买链接：*
-
-*	[京东](https://item.jd.com/12172435.html)
-*	[当当](http://product.dangdang.com/25156893.html)
+以下内容将修订为以 Lua 5.3.5 源代码为基础
 
 *	第一章 概论
 
