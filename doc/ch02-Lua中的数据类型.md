@@ -101,7 +101,7 @@ Lua 内部用一个宏`iscollectable`，表示哪些数据类型需要进行 gc 
 #define iscollectable(o)	(rttype(o) & BIT_ISCOLLECTABLE)
 ```
 
-可以看到，`tt_`的第6位用来表示该数据是否可回收
+可以看到，`tt_`的第7位用来表示该数据是否可回收
 
 那么，对于这些需要进行 gc 操作的数据类型，在 Lua 中是如何表示的呢?
 
