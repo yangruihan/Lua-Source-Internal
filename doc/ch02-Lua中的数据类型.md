@@ -181,7 +181,7 @@ union GCUnion {
 
 以上提到的结构关系如下图：
 
-![](../pic/ch02-1.png)
+![](../pic/ch02-1-1.png)
 
 **总结**
 
@@ -233,4 +233,4 @@ static TString *createstrobj (lua_State *L, size_t l, int tag, unsigned int h) {
 
 引用关系图如下：
 
-![](../pic/ch02-2.png)
+![](../pic/ch02-1-2.png)
